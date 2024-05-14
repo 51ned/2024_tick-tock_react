@@ -1,40 +1,56 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 import { Tick, TicksApi } from './api'
+
+
 let api: TicksApi
 api = new TicksApi()
-let count1 = 0;
-let count2 = 0
-let lastUpdate = Date.now();
+
+let lastUpdate = Date.now()
+let startTime = Date.now()
+let tickCount = 0
+
 
 export function App() {
-  /** amount of ticks */
-  const [amount, setAmount] = useState(100)
+  // amount of ticks
+  const [amount, setAmount] = useState(1000)
 
-  /** update delay in ms */
+  // update delay in ms
   const [delay, setDelay] = useState(3)
 
-  /** array of ticks */
+  // array of ticks
   const [ticks, setTicks] = useState<Tick[]>([])
 
   useEffect(() => {
     const onResponse = (tick: Tick) => {
       ticks[tick.index] = tick
 
-      /** check delay */
+      // check delay
       const now = Date.now()
-      // console.log('1', count1++)
-      console.log('delay1', delay)
+
+      tickCount++
+
+      if (tickCount >= 1000) {
+        const elapsedTime = now - startTime
+
+        console.log(`Time to reach 1000 ticks: ${elapsedTime} ms`)
+
+        tickCount = 0
+        startTime = now
+      }
+
       if (now - lastUpdate > delay) {
-        lastUpdate = now;
+        lastUpdate = now
         setTicks([...ticks])
       }
     }
-      // subscribe on tick event
-      api.on('tick', onResponse)
-      return () => {
-        // unsubscribe on tick event
-        api.off('tick', onResponse)
-      }
+
+    // subscribe on tick event
+    api.on('tick', onResponse)
+
+    return () => {
+      // unsubscribe on tick event
+      api.off('tick', onResponse)
+    }
   }, [])
 
   useEffect(() => {
@@ -65,9 +81,9 @@ export function App() {
       </label>
       <div className="list">
         {ticks.map((item) => {
-            return (
-              <div className={item.delay ? "item delay" : "item"} key={item.index}>{item.value}</div>
-            )
+          return (
+            <div className={item.delay ? "item delay" : "item"} key={item.index}>{item.value}</div>
+          )
         })}
       </div>
     </div>

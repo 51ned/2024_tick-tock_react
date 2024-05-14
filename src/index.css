@@ -1,12 +1,22 @@
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #000;
+  color: #fff;
+}
+
 .delay {
   color: red;
 }
 
 .list {
-  font-size: 12px;
-  line-height: 14px;
   border: 1px solid #ccc;
   display: grid;
+  font-size: 12px;
   grid-template-columns: repeat(25, auto);
+  line-height: 14px;
+  margin-top: 12px;
   user-select: none;
 }
