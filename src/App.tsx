@@ -2,17 +2,13 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { Tick, TicksApi } from './api'
 
 
-let api: TicksApi
-api = new TicksApi()
-
+let api: TicksApi = new TicksApi()
 let lastUpdate = Date.now()
-let startTime = Date.now()
-let tickCount = 0
 
 
 export function App() {
   // amount of ticks
-  const [amount, setAmount] = useState(1000)
+  const [amount, setAmount] = useState(100)
 
   // update delay in ms
   const [delay, setDelay] = useState(3)
@@ -22,40 +18,33 @@ export function App() {
 
   useEffect(() => {
     const onResponse = (tick: Tick) => {
-      ticks[tick.index] = tick
-
       // check delay
       const now = Date.now()
-
-      tickCount++
-
-      if (tickCount >= 1000) {
-        const elapsedTime = now - startTime
-
-        console.log(`Time to reach 1000 ticks: ${elapsedTime} ms`)
-
-        tickCount = 0
-        startTime = now
-      }
+      console.log('delay', delay)
 
       if (now - lastUpdate > delay) {
         lastUpdate = now
-        setTicks([...ticks])
+
+        setTicks((prevTicks) => {
+          const updatedTicks = [...prevTicks]
+          updatedTicks[tick.index] = tick
+          return updatedTicks
+        })
       }
     }
 
     // subscribe on tick event
     api.on('tick', onResponse)
 
-    return () => {
-      // unsubscribe on tick event
-      api.off('tick', onResponse)
-    }
+    // unsubscribe on tick event
+    return () => api.off('tick', onResponse)
   }, [])
 
   useEffect(() => {
     api.unSign()
+
     setTicks([])
+
     for (let i = 0; i < amount; i++) {
       api.sign(i)
     }
@@ -80,11 +69,11 @@ export function App() {
         amount <input type="number" step={100} value={amount} onChange={onChangeAmount} />
       </label>
       <div className="list">
-        {ticks.map((item) => {
-          return (
-            <div className={item.delay ? "item delay" : "item"} key={item.index}>{item.value}</div>
-          )
-        })}
+        {ticks.map((item) => (
+          <div className={item?.delay ? 'item delay' : 'item'} key={item?.index}>
+            {item?.value}
+          </div>
+        ))}
       </div>
     </div>
   )
