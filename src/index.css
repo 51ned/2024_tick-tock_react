@@ -1,0 +1,12 @@
+.delay {
+  color: red;
+}
+
+.list {
+  font-size: 12px;
+  line-height: 14px;
+  border: 1px solid #ccc;
+  display: grid;
+  grid-template-columns: repeat(25, auto);
+  user-select: none;
+}
